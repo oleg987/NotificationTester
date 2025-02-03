@@ -1,7 +1,7 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
-using MimeKit;
+using NotificationTester.WhoreTemplates;
 
 public class EmailSender
 {
@@ -14,7 +14,7 @@ public class EmailSender
         _settings = settings.Value;
     }
 
-    public async Task SendAsync(MimeMessage message, CancellationToken cancellationToken)
+    public async Task SendAsync(IMessageCreator messageCreator, CancellationToken cancellationToken)
     {
         using var client = new SmtpClient();
         
@@ -22,7 +22,7 @@ public class EmailSender
         
         try
         {
-            await client.ConnectAsync(_settings.Server, _settings.Port, SecureSocketOptions.StartTls,
+            await client.ConnectAsync(_settings.Server, _settings.Port, SecureSocketOptions.SslOnConnect,
                 cancellationToken);
             
             _logger.LogInformation($"{DateTime.Now}: Connected -> {client.IsConnected}...");
@@ -31,7 +31,7 @@ public class EmailSender
             
             _logger.LogInformation($"{DateTime.Now}: Authenticated -> {client.IsAuthenticated}...");
             
-            var response = await client.SendAsync(message, cancellationToken);
+            var response = await client.SendAsync(messageCreator.Create(), cancellationToken);
             
             _logger.LogInformation($"{DateTime.Now}: Message send. Server response: {response}...");
         }

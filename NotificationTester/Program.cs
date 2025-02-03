@@ -9,7 +9,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<PublicationMessageCreator>();
 builder.Services.AddTransient<EmailSender>();
 
 builder.Services.Configure<SmtpSettings>(builder
